@@ -1,0 +1,109 @@
+.cell {
+    width: 30px;
+    height: 30px;
+    border: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.cell.wall {
+    background-color: #1e293b;
+    animation: wallAnimation 0.3s ease-out;
+}
+
+.cell.start {
+    background-color: #10b981;
+}
+
+.cell.end {
+    background-color: #ef4444;
+}
+
+.cell.visited {
+    background-color: #93c5fd;
+    animation: visitedAnimation 1.5s ease-out;
+}
+
+.cell.path {
+    background-color: #fcd34d;
+    animation: pathAnimation 1.5s ease-out;
+}
+
+@keyframes visitedAnimation {
+    0% {
+        transform: scale(0.3);
+        background-color: #1e3a8a;
+    }
+    50% {
+        background-color: #3b82f6;
+    }
+    100% {
+        transform: scale(1);
+        background-color: #93c5fd;
+    }
+}
+
+@keyframes pathAnimation {
+    0% {
+        transform: scale(0.6);
+        background-color: #f59e0b;
+    }
+    50% {
+        transform: scale(1.2);
+        background-color: #fcd34d;
+    }
+    100% {
+        transform: scale(1);
+        background-color: #fcd34d;
+    }
+}
+
+@keyframes wallAnimation {
+    0% {
+        transform: scale(0.6);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.cell-weight {
+    position: absolute;
+    font-size: 10px;
+    color: white;
+    font-weight: bold;
+    text-shadow: 0 0 2px black;
+}
+
+.tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 200px;
+    background-color: #1e293b;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
