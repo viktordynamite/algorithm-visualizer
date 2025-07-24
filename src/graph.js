@@ -32,17 +32,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Checkboxes
     document.getElementById('directed-graph').addEventListener('change', function() {
-        graph.isDirected = this.ariaChecked;
+        graph.isDirected = this.checked;
         renderGraph();
     });
 
-    document.getElementById('show-weight').addEventListener('change', function() {
-        graph.showWeights = this.ariaChecked;
+    document.getElementById('show-weights').addEventListener('change', function() {
+        graph.showWeights = this.checked;
         renderGraph();
     });
 
     // Graph container events
-    graphContainer.addEventListener('click', handleGrahClick);
+    graphContainer.addEventListener('click', handleGraphClick);
     graphContainer.addEventListener('mousemove', handleMouseMove);
 
     setMode('add-node');
@@ -58,9 +58,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         const activeButton = document.getElementById(mode === 'delete' ? 'delete-mode' : mode);
-        if (activeBtn) {
-            activeBtn.classList.remove('bg-indigo-600');
-            activeBtn.classList.add('bg-indigo-800', 'ring-2', 'ring-indigo-300');
+        if (activeButton) {
+            activeButton.classList.remove('bg-indigo-600');
+            activeButton.classList.add('bg-indigo-800', 'ring-2', 'ring-indigo-300');
         }
 
         updateCursor();
@@ -117,12 +117,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function addNode(x, y) {
         const nodeId = graph.nextNodeId++;
-        const node = [
+        const node = {
             id: nodeId,
             x: x,
             y: y,
             label: nodeId
-        ];
+        };
 
         graph.nodes.push(node);
         graph.adjacencyList[nodeId] = [];
