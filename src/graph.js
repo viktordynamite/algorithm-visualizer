@@ -139,6 +139,68 @@ document.addEventListener('DOMContentLoaded', function() {
         renderGraph();
     }
 
+    function addEdge(node1, node2, weight = 1) {  
+        const existingEdge = graph.edges.find ( edge => 
+            (edge.from === node1.id && edge.to === node2.id) ||
+            (!graph.isDirected && edge.from === node2.id && edge.to === node1.id)
+        );
+
+        if (existingEdge) {
+            showToolTip('Edge already exists!', 'red');
+            return;
+        }
+
+        const edge = {
+            from: node1.id,
+            to: node2.id,
+            weight: weight
+        };
+
+        graph.edges.push(edge);
+        graph.adjacencyList[node1.id].push({ node: node2.id, weoght });
+        
+        if (!graph.isDirected) {
+            graph.adjacencyList[node2.id].push({ node: node1.id, weight });
+        }
+
+        renderGraph();
+    }
+
+    function deleteNode(nodeId) {
+        // remove node
+        graph.nodes = graph.nodes.filter(node => node.id !== nodeId);
+        
+        // removes connected edges to node
+        graph.edges = graph.edges.filter(edges => edge.from !== nodeId && edge.to !== nodeId);
+
+        // updating adjacency list
+        delete graph.adjacencyList[nodeId];
+        for (const key in graph.adjacencyList) {
+            graph.adjacencyList[key] = graph.adjacencyList[key].filter(neighbor => neighbor.node !== nodeId);
+        }
+
+        // remove from dropdowns
+        const options = startNodeSelect.querySelectorAll('option[value="${nodeId}"]');
+        options.forEach(option => option.remove());
+
+        renderGraph();
+    }
+
+    function deleteEdge(from, to) {
+        graph.edges = graph.edges.filter(edge => !(edge.from === from && edge.to === to));
+
+        graph.adjacencyList[from] = graph.adjacencyList[from].filter(neighbor => neighbor.node !== to)
+        if (!graph.isDirected) {
+            graph.adjacencyList[to] = graph.adjacencyList[to].filter(neighbor => neighbor.node !== from);
+        }
+
+        renderGraph();
+    }
+
+    function renderGraph() {
+
+    }
+
     // Sample nodes
     addNode(150, 150);
 });
