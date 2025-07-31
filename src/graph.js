@@ -198,59 +198,101 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function renderGraph() {
-        graphContainer.innerHTML = '';
+    graphContainer.innerHTML = '';
+    
+    // render edges first 
+    graph.edges.forEach(edge => {
+        const fromNode = graph.nodes.find(n => n.id === edge.from);
+        const toNode = graph.nodes.find(n => n.id === edge.to);
         
-        graph.edges.forEach(edge => {
-            const fromNode = graph.nodes.find(n => n.id === edge.from);
-            const toNode = graaph.nodes.find(n => n.id === edge.to);
+        if (!fromNode || !toNode) return;
+        
+        // Calc edge position and angle
+        const dx = toNode.x - fromNode.x;
+        const dy = toNode.y - fromNode.y;
+        const length = Math.sqrt(dx * dx + dy * dy);
+        const angle = Math.atan2(dy, dx);
+        
+        // create edge line
+        const edgeElement = document.createElement('div');
+        edgeElement.className = 'edge';
+        edgeElement.style.left = `${fromNode.x}px`;
+        edgeElement.style.top = `${fromNode.y}px`;
+        edgeElement.style.width = `${length}px`;
+        edgeElement.style.transform = `rotate(${angle}rad)`;
+        
+        // create arrow for directed graphs
+        if (graph.isDirected) {
+            const arrow = document.createElement('div');
+            arrow.className = 'edge-arrow';
+            arrow.style.left = `${toNode.x - 12}px`;
+            arrow.style.top = `${toNode.y}px`;
+            arrow.style.transform = `rotate(${angle}rad)`;
+            graphContainer.appendChild(arrow);
+        }
+        
+        // add weight label
+        if (graph.showWeights) {
+            const weightLabel = document.createElement('div');
+            weightLabel.textContent = edge.weight;
+            weightLabel.style.position = 'absolute';
+            weightLabel.style.left = `${fromNode.x + dx/2 - 10}px`;
+            weightLabel.style.top = `${fromNode.y + dy/2 - 10}px`;
+            weightLabel.style.backgroundColor = 'white';
+            weightLabel.style.padding = '2px 5px';
+            weightLabel.style.borderRadius = '4px';
+            weightLabel.style.fontSize = '12px';
+            weightLabel.style.border = '1px solid #ccc';
+            weightLabel.style.zIndex = '5';
+            graphContainer.appendChild(weightLabel);
+        }
+        
+        graphContainer.appendChild(edgeElement);
+        
+        // add click event for edge deletion
+        if (graph.mode === 'delete') {
+            edgeElement.style.cursor = 'pointer';
+            edgeElement.addEventListener('click', (e) => {
+                e.stopPropagation();
+                deleteEdge(edge.from, edge.to);
+            });
+        }
+    });
+    
+    // render nodes
+    graph.nodes.forEach(node => {
+        const nodeElement = document.createElement('div');
+        nodeElement.className = 'node';
+        nodeElement.textContent = node.label;
+        nodeElement.style.left = `${node.x - 25}px`;
+        nodeElement.style.top = `${node.y - 25}px`;
+        nodeElement.style.backgroundColor = '#3b82f6';
+        nodeElement.dataset.id = node.id;
+        
+        // make node draggable in move mode
+        if (graph.mode === 'move-node') {
+            makeNodeDraggable(nodeElement, node);
+        }
+        
+        // add tooltip on hovering
+        nodeElement.addEventListener('mouseenter', () => {
+            tooltip.textContent = `Node ${node.id}`;
+            tooltip.style.opacity = '1';
+        });
+        
+        nodeElement.addEventListener('mouseleave', () => {
+            tooltip.style.opacity = '0';
+        });
+        
+        graphContainer.appendChild(nodeElement);
+    });
+}
 
-            if (!fromNode || !toNode) return;
+function handleNodeClickForEdge(node) {
 
-            // Calc edge position and angle
-            const dx = toNode.x - fromNode.x;
-            const dy = toNode.y - fromNode.y;
-            const length = Math.sqrt(dx * dx + dy * dy);
-            const angle = Math.atan2(dy, dx);
-            
-            // create egde line 
-            const edgeElement = document.createElement('div');
-            edgeElement.className = 'edge';
-            edgeElement.style.left = '${fromNode.x}px';
-            edgeElement.style.right = '${fromNode.y}px';
-            edgeElement.style.width = '${length}px';
-            egdeElement.style.transform = 'rotate(${angle}rad)';
+}
 
-            // Create arrow for directed graph
-            if (graph.isDirected) {
-                const arrow = document.createElement('div');
-                arrow.className = 'edge-arrow';
-                arrow.style.left = '${toNode.x - 12}px';
-                arrow.style.top = '${toNode.y}px';
-                arrow.style.transform = 'rotate(${angle}rad)';
-                graphContainer.appendChild(arrow);
-            }
 
-            }
-            
-            // add weight if label is enabled
-            if (graph.showWeights) {
-                const weightLabel = document.createElement('div');
-                weightLabel.textContent = edge.weight;
-                weightLabel.style.position = 'absolute';
-                weightLabel.style.left = '${fromNode.x + dx/2 - 10}px';
-                weightLabel.style.top = '${fromNode.y + dy/2 - 10}px';
-                weightLabel.style.backgroundColor = 'white';
-                weightLabel.style.padding = '2px 5px';
-                weightLabel.style.norderRadius = '4px';
-                weightLabel.style.fontSize = '12px';
-                weightLabel.style.border = '1px solid #ccc';
-                weightLabel.style.zIndex = '5';
-                graphContainer.appendChild(weightLabel);
-            }      
-
-            graphContainer.appendChild(edgeElement);
-        )
-    }
 
     // Sample nodes
     addNode(150, 150);
