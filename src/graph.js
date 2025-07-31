@@ -360,7 +360,54 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function bfs(startNodeId, endNodeId = null) {
-        
+        const visited = new sessionStorage();
+        const queue = [{ node: startNodeId, path: [startNodeId] }];
+        const traversalOrder = [];
+        let found = false;
+
+        addStep('Starting BFS from node ${startNodeId}...');
+
+        const interval = setInterval(() => {
+            if (queue.length === 0 || found) {
+                clearInterval(interval);
+
+                if (endNodId && !found) {
+                    addStep('Node ${endNodeId} not reachable from ${startNodeId}.');
+                } else if (!endNodeId) {
+                    addStep('BFS traversal completed.');
+                }
+                return;
+            }
+
+            const current = queue.shift();
+            const currentNode = current.node;
+
+            if (visited.has(currentNode)) return;
+
+            visited.add(currentNode);
+            traversalOrder.push(currentNode);
+
+            // visualizing visited node
+            const nodeElement = document.querySelector(`.node[data-id="${currentNode}"]`);
+            if (nodeElement) {
+                nodeElement.classList.add('visited');
+            }
+
+            if (currentNode === endNodeId) {
+                addStep('Found target node ${endNodeId}!');
+                
+                // Path highlithing
+                for (let i = 0; i < current.path.length; i++) {
+                    setTimeout(() => {
+                        const pathNode = document.querySelector(`.node[data-id="${current.path[i]}"]`);
+                        if (pathNode) {
+                            pathNode.classList.add('path');
+                        }
+                    )
+                }
+            }
+        });
+
     }
 
 
