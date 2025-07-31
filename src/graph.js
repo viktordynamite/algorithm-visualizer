@@ -288,9 +288,80 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 }
 
-function handleNodeClickForEdge(node) {
+    function handleNodeClickForEdge(node) {
+        if (!graph.edgeStartNode) {
+        graph.edgeStartNode = node;
+        showTooltip(`Selected node ${node.id}. Click another node to connect.`, 'green');
+        } else if  (graph.edgeStartNode.id === node.id) {
+            showTooltip('Cannot connect a node to itself!', 'red');
+            graph.edgeStartNode = null;
+        } else {
+            // edge weight
+            const weight = prompt('Enter edge weight (default: 1)', '1');
+            if (weight !== null) {
+                const numWeight = parseInt(weight) || 1;
+                addEdge(graph.edgeStartNode, node, numWeight);
+            }
+            graph.edgeStartNode = null;
+        }
+    }
 
-}
+    function makeNodeDraggable(nodeElement, nodeData) {
+        let isDragging = false;
+        let offsetX, offsetY;
+
+        nodeElement.addEventListener('mousedown', (e) => {
+            if (graph.mode !== 'move-node') return;
+
+            isDragging = true;
+            offsetX = e.clientX - nodeData.x;
+            offsetY = e.clientY - nodeData.y;
+            nodeElement.style.cursor = 'grabbing';
+            e.preventDefault();   
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging || graph.mode !== 'move-node') return;
+
+            nodeData.x = e.clientX - offsetX;
+            nodeData.y = e.clientY - offsetY;
+            
+            nodeElement.style.left = `${nodeData.x - 25}px`;
+            nodeElement.style.top = `${nodeData.y - 25}px`;
+
+            renderGraph();
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (isDragging) {
+                isDragging = false;
+                nodeElement.style.cursor = 'grab';
+            }
+        });
+    }
+
+    function traverseGraph(algorithm) {
+        const startNodeId = parseInt(startNodeSelect.value);
+        const endNodeId = parseInt(endNodeSelect.value);
+
+        if (!startNodeId) {
+            showTooltip('Please select a start node.', 'red');
+            return;
+        }
+
+        resetTraversal(false);
+
+        // perform traversal
+        if (algorithm === 'bfs') {
+            bfs(startNodeId, endNodeId);
+        } else if (algorithm === 'dfs') {
+            dfs(startNodeId, endNodeId);
+        }
+    }
+
+    function bfs(startNodeId, endNodeId = null) {
+        
+    }
 
 
 
