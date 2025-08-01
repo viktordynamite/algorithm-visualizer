@@ -443,6 +443,92 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function dfs(startNodeId, endNodeId = null) {
+        const visited = new Set();
+        const stack = [{ node: startNodeId, path: [startNodeId] }];
+        const traversalOrder = [];
+        let found = false;
+
+        addStep(`Starting DFS from node ${startNodeId}...`);
+
+        const interval = setInterval(() => { 
+            if (stack.length === 0 || found) {
+                clearInterval(interval);
+                
+                if (endNodeId && !found) {
+                    addStep(`Node ${endNodeId} not reachable from ${startNodeId}.`);
+                } else if (!endNodeId) {
+                    addStep('DFS completed!');
+                }
+                return;
+            }
+
+            const current = stack.pop();
+            const currentNode = current.node;
+
+            if (visited.has(currentNode)) return;
+                    
+            visited.add(currentNode);
+            traversalOrder.push(currentNode);
+
+            // visualize visited nodes
+            const nodeElement = document.querySelector(`.node[data-id="${currentNode}"]`);
+            if (nodeElement) {
+                nodeElement.classList.add('visited');
+            }
+
+            if (currentNode === endNodeId) {
+                addStep(`Found target node ${endNodeId}!`);
+
+                // path highlight
+                for (let i = 0; i < current.path.length; i++) {
+                    setTimeout(() => {
+                        const pathNode = document.querySelector(`.node[data-id="${current.path[i]}"]`);
+                        if (pathNode) {
+                            pathNode.classList.add('path');
+                        }
+
+                        if (i > 0) {
+                            // highlight edge between path [i - 1] and path [i]
+                            const from = current.path[i-1];
+                            const to = current.path[i];
+                            const edgeElements = document.querySelectorAll('.edge');
+                            edgeElements.forEach(edge => {
+                                const fromAttr = parseInt(edge.parentElement?.querySelector('.node')?.dataset.id);
+                                const toAttr = parseInt(edge.nextElementSibling?.dataset.id);
+                                if ((fromAttr === from && toAttr === to) || (!graph.isDirected && fromAttr === to && toAttr === from)) {
+                                    edge.classList.add('path');
+                                }
+                            });
+                        }
+
+                        if (i === current.path.length - 1) {
+                            addStep(`Path found: ${current.path.join(' → ')}`);
+                        }
+                    }, i * 500);
+                }
+
+                found = true;
+                return;
+            }
+
+            addStep(`Visiting node ${currentNode}`);
+
+            // Push neighbors to stack (in reverse order to visit left to right)
+            const neighbors = graph.adjacencyList[currentNode] || [];
+            for (let i = neighbors.length - 1; i >= 0; i--) {
+                const neighbor = neighbors[i];
+                if (!visited.has(neighbor.node)) {
+                    stack.push({
+                        node: neighbor.node,
+                        path: [...current.path, neighbor.node]
+                    });
+                    addStep(`Adding node ${neighbor.node} to stack`, 'ml-4 text-gray-600');
+                }
+            }
+        }, 1000);
+    }
+
+    function resetTraversal(clearSteps = true) {
         
     }
 
