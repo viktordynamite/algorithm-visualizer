@@ -403,11 +403,47 @@ document.addEventListener('DOMContentLoaded', function() {
                         if (pathNode) {
                             pathNode.classList.add('path');
                         }
-                    )
+
+                        if (i > 0) {
+                            // Highlight edge between path [i - 1] and path [i]
+                            const from = current.path[i-1];
+                            const to = current.path[i];
+                            const edgeElements = document.querySelectorAll('.edge');
+                            edgeElements.forEach(edge => {
+                                const fromAttr = parseInt(edge.parentElement?.querySelector('.node')?.dataset.id);
+                                const toAttr = parseInt(edge.nextElementSibling?.dataset.id);
+                                if ((fromAttr === from && toAttr === to) || (!graph.isDirected && fromAttr === to && toAttr === from)) {
+                                    edge.classList.add('path');
+                                }
+                            });
+                        }
+                        if (i === current.path.length - 1) {
+                            addStep(`Shortest path: ${current.path.join(' → ')}`);
+                        }
+                    }, i * 500);
+                }
+
+                found = true;
+                return;
+            }
+
+            addStep(`Visiting node ${currentNode}...`);
+            const neighbors = graph.adjacencyList[currentNode] || [];
+            for (const neighbor of neighbors) {
+                if (!visited.has(neighbor.node)) {
+                    queue.push({
+                        node: neighbor.node,
+                        path: [...current.path, neighbor.node]
+                    });
+                    addStep(`Adding node ${neighbor.node} to queue`, 'ml-4 text-gray-600');
                 }
             }
-        });
 
+        }, 1000);
+    }
+
+    function dfs(startNodeId, endNodeId = null) {
+        
     }
 
 
